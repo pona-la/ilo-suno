@@ -1,0 +1,53 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'yaml'
+require 'active_record'
+
+db_config_file = File.open('db/config.yml')
+db_config = YAML.safe_load(db_config_file)['development']
+
+ActiveRecord::Base.establish_connection(db_config)
+
+require_relative '../lib/discord_sender'
+require_relative '../lib/event'
+require_relative '../lib/schedule_fetcher'
+
+config = YAML.load_file('config.yml')
+
+fetcher = ScheduleFetcher.new(config['schedule_url'], config['start_timestamp'])
+sender = DiscordSender.new(config['webhook_url'])
+
+def fetch_events(fetcher)
+  loop do
+    fetcher.fetch
+
+    sleep(10)
+  end
+end
+
+def send_webhooks(sender, base_url)
+  loop do
+    # Pop data from the queu-e
+    event = Event.where(sent_at: nil).find_by('start_time < ?', Time.now)
+
+    # Perform actions based on fetched data
+    if event
+      next if event.sent_at
+
+      puts "Sending Event '#{event.title}'"
+
+      next_up = Event.find_by('start_time > ?', event.start_time)
+      sender.event_embed(event, next_up, base_url)
+      event.sent_at = Time.now
+      event.save
+    end
+    sleep(30)
+  end
+end
+
+fetch_thread = Thread.new { fetch_events(fetcher) }
+perform_thread = Thread.new { send_webhooks(sender, config['base_url']) }
+
+fetch_thread.join
+perform_thread.join

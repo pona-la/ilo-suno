@@ -1,0 +1,4 @@
+base_url: https://suno.pona.la/2023/tenpo
+webhook_url: https://discord.com/api/webhooks/...
+schedule_url: https://suno.pona.la/2023/tenpo/schedule.json
+start_timestamp: 1710680400
