@@ -14,6 +14,8 @@ class ScheduleFetcher
     response = Net::HTTP.get_response(@url)
     json = JSON.parse(response.body)
     process_events(json)
+  rescue StandardError => e
+    puts "An error occurred while fetching schedule: #{e}"
   end
 
   def process_events(events)
