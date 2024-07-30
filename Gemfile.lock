@@ -112,7 +112,7 @@ GEM
       netrc (~> 0.8)
     reverse_markdown (2.1.1)
       nokogiri
-    sqlite3 (2.0.3-x86_64-linux-gnu)
+    sqlite3 (1.7.3-x86_64-linux)
     standalone_migrations (7.1.3)
       activerecord (>= 6.0.0, < 7.2)
       nokogiri (~> 1.14)
@@ -136,7 +136,7 @@ PLATFORMS
 DEPENDENCIES
   discordrb (~> 3.5)
   reverse_markdown
-  sqlite3
+  sqlite3 (~> 1.4)
   standalone_migrations
 
 BUNDLED WITH
